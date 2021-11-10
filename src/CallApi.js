@@ -1,38 +1,20 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Input from "./Input";
 
 const CallApi = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [countries, setcountries] = useState(null);
-  const [searchInput, setSearchInput] = useState("uk");
+  const [searchInput, setSearchInput] = useState(null);
 
-  const Input = () => {
-    return (
-      <>
-        <label for="countrySearch">Choose a country:</label>
-        <input
-          list="countries"
-          id="countrySearch"
-          name="countrySearch"
-          aria-label="Search through countries"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-        />
-        <datalist id="countries">
-          {countries &&
-            countries.map((item) => (
-              <option key={item?.name?.official} value={item?.name?.official} />
-            ))}
-        </datalist>
-      </>
-    );
-  };
   useEffect(() => {
     async function fetchData() {
       const options = {
         method: "GET",
-        url: "https://restcountries.com/v3.1/all"
+        url: !!searchInput
+          ? `https://restcountries.com/v3.1/name/${searchInput}?fullText=true`
+          : `https://restcountries.com/v3.1/all`
       };
 
       setIsLoading(true);
@@ -51,9 +33,12 @@ const CallApi = () => {
 
   return (
     <>
-      <Input />
-      {console.log(countries && countries.map((r) => r.name.official))}
-      {!isLoading && hasError && <span>error</span>}
+      <Input
+        searchInput={searchInput}
+        countries={countries}
+        setSearchInput={setSearchInput}
+      />
+      {!isLoading && hasError && <span>no match</span>}
       {isLoading && <div>spinner</div>}
       {!isLoading && countries && (
         <ul>
