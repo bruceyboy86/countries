@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Input from "./Input";
+import Region from "./Region";
 
-const CallApi = () => {
+const CallApi = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [countries, setcountries] = useState(null);
-  const [searchInput, setSearchInput] = useState(null);
+  const [region, setRegion] = useState("Europe");
+  const [searchInput, setSearchInput] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -22,30 +24,36 @@ const CallApi = () => {
       await axios
         .request(options)
         .then((response) => {
-          setcountries(response.data);
+          setcountries(
+            response.data.filter((cntry) => cntry.region === region)
+          );
           setHasError(false);
         })
         .catch(() => setHasError(true))
         .finally(() => setIsLoading(false));
     }
     fetchData().catch(console.error);
-  }, [searchInput]);
+  }, [searchInput, region]);
 
   return (
     <>
-      <Input
-        searchInput={searchInput}
-        countries={countries}
-        setSearchInput={setSearchInput}
-      />
       {!isLoading && hasError && <span>no match</span>}
       {isLoading && <div>spinner</div>}
       {!isLoading && countries && (
-        <ul>
-          {countries.map((item) => (
-            <li key={item?.name?.official}>{item?.name?.official}</li>
-          ))}
-        </ul>
+        <>
+          <Region region={region} setRegion={setRegion} />
+
+          <Input
+            searchInput={searchInput}
+            countries={countries}
+            setSearchInput={setSearchInput}
+          />
+          <ul>
+            {countries.map((item) => (
+              <li key={item?.name?.common}>{item?.name?.common}</li>
+            ))}
+          </ul>
+        </>
       )}
     </>
   );
