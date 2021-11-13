@@ -3,6 +3,31 @@ import axios from "axios";
 import Input from "./Input";
 import Region from "./Region";
 
+const CountryFlag = (props) => {
+  return (
+    <>
+      <div>
+        <img
+          src={props.country[0].flags.png}
+          alt={"flag of " + props.country[0].name.common}
+        />
+      </div>
+    </>
+  );
+};
+
+const CountryTitle = (props) => {
+  return <h1>{props.title}</h1>;
+};
+
+const CountryOfficialName = (props) => {
+  return <h2>Official name: {props.name}</h2>;
+};
+
+const CountryNativeName = (props) => {
+  return <h2>Native name: {props.name}</h2>;
+};
+
 const CallApi = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -35,24 +60,39 @@ const CallApi = (props) => {
     fetchData().catch(console.error);
   }, [searchInput, region]);
 
+  let selectedCountry = countries?.filter((c) => c.name.common === searchInput);
+
+  console.log(
+    selectedCountry && selectedCountry[0]?.name.nativeName.map((n) => n)
+  );
+
   return (
     <>
-      {!isLoading && hasError && <span>no match</span>}
-      {isLoading && <div>spinner</div>}
-      {!isLoading && countries && (
+      <Region region={region} setRegion={setRegion} />
+      {countries && (
         <>
-          <Region region={region} setRegion={setRegion} />
-
           <Input
             searchInput={searchInput}
             countries={countries}
             setSearchInput={setSearchInput}
           />
-          <ul>
-            {countries.map((item) => (
-              <li key={item?.name?.common}>{item?.name?.common}</li>
-            ))}
-          </ul>
+          {!isLoading && hasError && <div>no match</div>}
+          {isLoading && <div>spinner</div>}
+          {searchInput && selectedCountry[0] && (
+            <>
+              <CountryTitle title={selectedCountry[0].name.common} />
+              <CountryFlag country={selectedCountry} />
+              <CountryOfficialName name={selectedCountry[0].name.official} />
+              <CountryNativeName name={selectedCountry[0].name.official} />
+            </>
+          )}
+
+          <div>
+            <p>
+              ---a .map(c ={">"} anchor for each item, onClick sets the
+              searchinput ) of filtered countries here---
+            </p>
+          </div>
         </>
       )}
     </>

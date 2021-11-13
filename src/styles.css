@@ -2,6 +2,9 @@
   font-family: sans-serif;
   text-align: center;
 }
+img {
+  margin: auto;
+}
 
 /*  https://piccalil.li/blog/a-modern-css-reset/ */
 /* Box sizing rules */
